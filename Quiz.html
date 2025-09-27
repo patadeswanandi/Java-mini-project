@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Quest</title>
+<style>
+    :root {
+        --dark-bg: #0a192f;
+        --dark-card: #102a43;
+        --neon-green: #66fcf1;
+        --text-color: #f0f0f0;
+        --secondary-color: #c5c6c7;
+        --win-color: #1f3b39;
+        --lose-color: #3b1f1f;
+        --draw-color: #2f3b49;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--dark-bg);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Cpath fill='%23102a43' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        margin: 0;
+        padding: 0;
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+   
+    .container {
+        max-width: 700px;
+        width: 90%;
+        background: var(--dark-card);
+        border-radius: 15px;
+        border: 2px solid transparent;
+        box-shadow: 0 0 20px rgba(102, 252, 241, 0.2);
+        padding: 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: box-shadow 0.5s ease;
+    }
+    .glowing-border {
+        animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+        0% { box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green); }
+        100% { box-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
+    }
+
+    /* Welcome/Result Card Styling */
+    .card-content {
+        padding: 40px 20px;
+        background: var(--dark-card);
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* ✨ Username Input Field */
+    #username {
+        padding: 12px 20px;
+        width: 80%;
+        border-radius: 25px;
+        border: 2px solid #334257;
+        outline: none;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        text-align: center;
+        background: #1a3a5f;
+        color: var(--text-color);
+    }
+    #username::placeholder {
+        color: #a0a0a0;
+    }
+    #username:focus {
+        border-color: var(--neon-green);
+        box-shadow: 0 0 10px var(--neon-green);
+    }
+    
+    /* 🎨 Primary Action Button */
+    .start-btn, .play-again-btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        background: var(--neon-green);
+        color: var(--dark-bg);
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px var(--neon-green);
+        margin-top: 20px;
+    }
+    .start-btn:hover, .play-again-btn:hover {
+        background: #45a29e;
+        transform: scale(1.05);
+        box-shadow: 0 0 20px var(--neon-green);
+    }
+    .start-btn:active, .play-again-btn:active {
+        transform: scale(1);
+    }
+
+    /* Exit/Secondary Button */
+    .exit-btn {
+        padding: 10px 20px;
+        border: 2px solid var(--secondary-color);
+        border-radius: 25px;
+        background: transparent;
+        color: var(--secondary-color);
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+    }
+    .exit-btn:hover {
+        background: var(--secondary-color);
+        color: var(--dark-bg);
+        transform: scale(1.05);
+    }
+    .exit-btn:active {
+        transform: scale(1);
+    }
+    
+    /* ✨ Heading styling */
+    h1 {
+        font-size: 3rem;
+        color: var(--neon-green);
+        text-shadow: 0 0 5px var(--neon-green);
+        margin-bottom: 20px;
+    }
+    
+    h2, h3 {
+        color: var(--secondary-color);
+        text-shadow: 0 0 3px var(--secondary-color);
+    }
+    
+    .option-btn {
+        display: block;
+        margin: 15px auto;
+        width: 85%;
+        font-size: 16px;
+        background-color: #1a3a5f;
+        color: var(--text-color);
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #334257;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: left;
+    }
+    .option-btn:hover {
+        background-color: #2e4a6d;
+        border-color: var(--neon-green);
+        color: var(--neon-green);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 252, 241, 0.2);
+    }
+    .option-btn:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+    
+    #rpsDiv { display:none; margin-top:25px; }
+    #rpsDiv button {
+        background: var(--neon-green);
+        color: var(--dark-bg);
+        border: none;
+        padding: 10px 20px;
+        margin: 0 5px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    #rpsDiv button:hover {
+        background-color: #45a29e;
+        box-shadow: 0 0 15px var(--neon-green);
+        transform: scale(1.05);
+    }
+    #rpsDiv button:active {
+        transform: scale(1);
+    }
+    
+    /* 🎨 Catchy Result Box */
+    #rpsResult {
+        display:none;
+        margin-top:20px;
+        padding: 20px;
+        border-radius: 12px;
+        font-weight:bold;
+        font-size: 18px;
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    .rps-win { background: var(--win-color); color: var(--neon-green); border: 2px solid var(--neon-green); }
+    .rps-lose { background: var(--lose-color); color: #ff6347; border: 2px solid #ff6347; }
+    .rps-draw { background: var(--draw-color); color: var(--secondary-color); border: 2px solid var(--secondary-color); }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    #resultDiv { 
+        display:none; 
+        margin-top: 20px; 
+    }
+    .score-card {
+        background: #1a3a5f;
+        padding: 30px;
+        border-radius: 15px;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        animation: scoreCardPop 0.5s ease-out;
+    }
+
+    @keyframes scoreCardPop {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    
+    .score-display {
+        font-size: 3rem;
+        font-weight: bold;
+        color: var(--neon-green);
+        text-shadow: 0 0 10px var(--neon-green);
+        margin: 20px 0;
+        animation: scorePop 0.5s ease-in-out;
+    }
+    @keyframes scorePop {
+        from { transform: scale(0.5); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+</style>
+</head>
+<body>
+<div class="container glowing-border">
+    <div id="userInputDiv" class="card-content">
+        <h1>Quiz Quest</h1>
+        <p>Prepare for your mission!</p>
+        <input type="text" id="username" placeholder="Enter your username">
+        <button class="start-btn" onclick="startQuiz()">Start Mission</button>
+    </div>
+   
+    <div id="quizDiv" style="display:none;">
+        <h2 id="questionText"></h2>
+        <div id="optionsDiv"></div>
+        <button class="exit-btn" onclick="exitQuiz()">Abort Mission</button>
+   
+        <div id="rpsDiv">
+            <h3>Rock-Paper-Scissors Bonus!</h3>
+            <p>Choose your move:</p>
+            <button onclick="playRPS('rock')">Rock</button>
+            <button onclick="playRPS('paper')">Paper</button>
+            <button onclick="playRPS('scissors')">Scissors</button>
+        </div>
+   
+        <div id="rpsResult"></div>
+    </div>
+   
+    <div id="resultDiv" class="score-card" style="display:none;">
+        <h2 id="finalMessage"></h2>
+        <h3 class="score-display" id="resultText"></h3>
+        <p id="scoreMessage"></p>
+        <button class="start-btn play-again-btn" onclick="location.reload()">Replay Mission</button>
+    </div>
+</div>
+<script>
+    const questions = [
+        {q:"What is the capital of France?", options:["Berlin","Madrid","Paris","Rome"], answer:2},
+        {q:"Which language is used for Android development?", options:["Kotlin","Java","Python","C++"], answer:1},
+        {q:"Who is the father of Computers?", options:["Charles Babbage","Alan Turing","Bill Gates","Steve Jobs"], answer:0},
+        {q:"What is the national animal of India?", options:["Lion","Tiger","Elephant","Peacock"], answer:1},
+        {q:"Which planet is known as the Red Planet?", options:["Jupiter","Venus","Earth","Mars"], answer:3},
+        {q:"Who invented Java Programming?", options:["Dennis Ritchie","James Gosling","Guido van Rossum","Bjarne Stroustrup"], answer:1},
+        {q:"What is the square root of 144?", options:["10","11","12","14"], answer:2},
+        {q:"Which data structure uses LIFO?", options:["Queue","Stack","Array","Tree"], answer:1},
+        {q:"What is 25 * 4?", options:["50","75","100","125"], answer:2},
+        {q:"Which gas do plants release during photosynthesis?", options:["Oxygen","Carbon Dioxide","Nitrogen","Hydrogen"], answer:0},
+        {q:"Who is known as the Missile Man of India?", options:["Vikram Sarabhai","APJ Abdul Kalam","Homi Bhabha","C. V. Raman"], answer:1},
+        {q:"What is the boiling point of water (in Celsius)?", options:["0","50","100","212"], answer:2},
+        {q:"Which ocean is the largest?", options:["Atlantic","Pacific","Indian","Arctic"], answer:1},
+        {q:"Which year did World War II end?", options:["1918","1939","1945","1965"], answer:2},
+        {q:"Who wrote 'Romeo and Juliet'?", options:["William Wordsworth","William Shakespeare","Charles Dickens","John Milton"], answer:1},
+        {q:"Which device is used to measure temperature?", options:["Barometer","Thermometer","Speedometer","Altimeter"], answer:1},
+        {q:"What is the chemical symbol for Gold?", options:["Ag","Au","Pb","Pt"], answer:1},
+        {q:"Who discovered gravity?", options:["Albert Einstein","Isaac Newton","Galileo Galilei","Nikola Tesla"], answer:1},
+        {q:"Which is the fastest land animal?", options:["Horse","Leopard","Cheetah","Tiger"], answer:2},
+        {q:"Who painted the Mona Lisa?", options:["Leonardo da Vinci","Pablo Picasso","Vincent Van Gogh","Michelangelo"], answer:0}
+    ];
+   
+    let currentQ = 0;
+    let score = 0;
+    let bonusAnswer = '';
+   
+    function startQuiz() {
+        const username = document.getElementById('username').value;
+        if(!username) { alert("Enter username!"); return; }
+        document.getElementById('userInputDiv').style.display='none';
+        document.getElementById('quizDiv').style.display='block';
+        currentQ = 0; score = 0;
+        showQuestion();
+    }
+   
+    function showQuestion() {
+        document.getElementById('rpsDiv').style.display='none';
+        document.getElementById('rpsResult').style.display='none';
+        if(currentQ >= questions.length){
+            endQuiz();
+            return;
+        }
+        const q = questions[currentQ];
+        document.getElementById('questionText').innerText = q.q;
+        const optionsDiv = document.getElementById('optionsDiv');
+        optionsDiv.innerHTML='';
+        q.options.forEach((opt,i)=>{
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.className='option-btn';
+            btn.onclick = ()=>checkAnswer(i);
+            optionsDiv.appendChild(btn);
+        });
+    }
+   
+    function checkAnswer(choice){
+        const q = questions[currentQ];
+        if(choice === q.answer){
+            score++;
+            currentQ++;
+            showQuestion();
+        } else {
+            bonusAnswer = q.options[q.answer];
+            document.getElementById('rpsDiv').style.display='block';
+        }
+    }
+   
+    function playRPS(userMove){
+        const moves = ["rock","paper","scissors"];
+        const compMove = moves[Math.floor(Math.random()*3)];
+        const resultBox = document.getElementById('rpsResult');
+        let rpsMessage = '';
+        let cssClass = '';
+   
+        if(userMove === compMove){
+            rpsMessage = `It's a Draw! No bonus point.`;
+            cssClass = "rps-draw";
+        } else if(
+            (userMove==="rock" && compMove==="scissors") ||
+            (userMove==="paper" && compMove==="rock") ||
+            (userMove==="scissors" && compMove==="paper")
+        ){
+            rpsMessage = `You won Rock-Paper-Scissors! Bonus point awarded.`;
+            score++;
+            cssClass = "rps-win";
+        } else {
+            rpsMessage = `You lost Rock-Paper-Scissors.`;
+            cssClass = "rps-lose";
+        }
+   
+        resultBox.className = cssClass;
+        resultBox.style.display = 'block';
+        resultBox.innerHTML = `${rpsMessage}<br>Correct Answer: ${bonusAnswer}`;
+   
+        currentQ++;
+        setTimeout(showQuestion, 3000);
+    }
+   
+    function exitQuiz(){
+        endQuiz();
+    }
+   
+    function endQuiz(){
+        document.getElementById('quizDiv').style.display='none';
+        document.getElementById('resultDiv').style.display='block';
+        document.getElementById('resultText').innerText = `Your Score: ${score}/${questions.length}`;
+        
+        const percentage = (score / questions.length) * 100;
+        let message = "";
+        if (percentage >= 80) {
+            message = "Mission Accomplished! You are a true Quiz Master.";
+        } else if (percentage >= 50) {
+            message = "Mission Status: Successful. You've got what it takes!";
+        } else {
+            message = "Mission Incomplete. Analyze the data and try again!";
+        }
+        document.getElementById('finalMessage').innerText = message;
+    }
+</script>
+</body>
+</html>
